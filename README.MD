@@ -16,9 +16,10 @@ Feedback:
 - определение тона(настроения) отзыва (Mixtral)
 
 ## Запуск контейнеров
-Быстрый запуск:
+Запуск:
 ```
 bash build/marketplace.sh
+bash build/migrations_activate.sh
 ```
 
 ## Миграции
