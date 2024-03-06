@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  marketplace:
+    container_name: marketplace
+    image: marketplace_image
+    build:
+      context: .
+      dockerfile: docker/marketplace.Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level error
+    volumes:
+      - ./apps/marketplace/:/code
+    ports:
+      - 8000:8000
+    env_file:
+      - ${ENV_FILE}
+    networks:
+      - marketplace_network
+
+  marketplace_pg:
+    container_name: marketplace_pg
+    image: marketplace_pg_image
+    build:
+      context: .
+      dockerfile: docker/pg.Dockerfile
+    volumes:
+      - marketplace_pg_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    env_file:
+      - ${ENV_FILE}
+    networks:
+      - marketplace_network
+
+volumes:
+  marketplace_pg_data:
+
+networks:
+  marketplace_network:
+    driver: bridge

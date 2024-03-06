@@ -1,0 +1,21 @@
+environs
+requests
+pytz
+
+# local
+flake8
+pre-commit
+
+# web
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+
+# db
+psycopg2-binary
+SQLAlchemy
+alembic
+
+# logging
+loguru
