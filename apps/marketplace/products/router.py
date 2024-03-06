@@ -37,6 +37,28 @@ async def get_product(
 
 
 @router.get(
+    "/product/{product_id}/feedbacks",
+    response_model=ProductSchema,
+    description="Get feedbacks for product by id.",
+)
+async def get_product_feedbacks(
+    product_id: int,
+    session: Session = Depends(get_session),
+):
+    product = models.Product.get_by_id(
+        session=session,
+        id=product_id,
+    )
+    if product:
+        return product
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+
+
+@router.get(
     "/products",
     response_model=list[ProductSchema],
     description="Get products list.",
@@ -87,7 +109,7 @@ async def update_product(
 
 @router.delete(
     "/product/{product_id}",
-    response_model=ProductSchema,
+    # response_model=ProductSchema,
     description="Delete product by id.",
 )
 async def delete_product(

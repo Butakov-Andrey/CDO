@@ -19,3 +19,7 @@ alembic
 
 # logging
 loguru
+
+# gpt
+openai==0.28.1
+tiktoken

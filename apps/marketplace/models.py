@@ -1,8 +1,11 @@
 import datetime
+import enum
+from typing import List
 
+from feedback.services import check_sentiment
 from products.schema import UpdateProductSchema
-from sqlalchemy import TIMESTAMP, String, select
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+from sqlalchemy import TIMESTAMP, ForeignKey, String, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship
 from sqlalchemy.sql import func
 
 
@@ -18,6 +21,11 @@ class Product(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(20))
     created_at: Mapped[datetime.datetime] = mapped_column(default=func.now())
+
+    feedbacks: Mapped[List["FeedBack"]] = relationship(
+        back_populates="product",
+        cascade="all, delete",
+    )
 
     @classmethod
     def get_by_id(cls, id: int, session: Session):
@@ -69,3 +77,70 @@ class Product(Base):
             session.add(product)
             session.commit()
         return product
+
+    @classmethod
+    def get_feedbacks_for_product(cls, id: int, session: Session):
+        stmt = select(cls).where(cls.id == id)
+        product = session.scalars(stmt).first()
+        return product.feedbacks
+
+
+class Sentiments(enum.Enum):
+    POSITIVE = "positive"
+    NEGATIVE = "negative"
+    NEUTRAL = "neutral"
+
+
+class FeedBack(Base):
+    __tablename__ = "feedbacks"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    text: Mapped[str] = mapped_column(String)
+    created_at: Mapped[datetime.datetime] = mapped_column(default=func.now())
+    sentiment: Mapped[Sentiments]
+
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE")
+    )
+
+    product: Mapped["Product"] = relationship(back_populates="feedbacks")
+
+    @classmethod
+    def get_by_id(cls, id: int, session: Session):
+        stmt = select(cls).where(cls.id == id)
+        feedback = session.scalars(stmt).first()
+        return feedback
+
+    @classmethod
+    def get_list(cls, session: Session):
+        stmt = select(cls)
+        feedbacks = session.scalars(stmt).all()
+        return feedbacks
+
+    @classmethod
+    def delete_by_id(cls, id: int, session: Session):
+        stmt = select(cls).where(cls.id == id)
+        feedback = session.scalars(stmt).first()
+        if feedback:
+            session.delete(feedback)
+            session.commit()
+            return True
+        else:
+            return None
+
+    @classmethod
+    def create(
+        cls,
+        session: Session,
+        product_id: int,
+        text: str,
+    ):
+        product = Product.get_by_id(id=product_id, session=session)
+        if product:
+            sentiment = check_sentiment(text)
+            feedback = cls(product_id=product_id, text=text, sentiment=sentiment)
+            session.add(feedback)
+            session.commit()
+            return feedback
+        else:
+            return None

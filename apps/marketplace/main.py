@@ -4,6 +4,7 @@ from config import settings
 from dependencies import logging
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from feedback.router import router as feedback_router
 from loguru import logger
 from products.router import router as product_router
 
@@ -40,3 +41,4 @@ app.add_middleware(
 
 # routers
 app.include_router(product_router, dependencies=[Depends(logging)])
+app.include_router(feedback_router, dependencies=[Depends(logging)])
