@@ -1,10 +1,13 @@
 import json
 import time
+from io import BytesIO
 
 import config
 import models
 import openai
+import pytesseract
 from loguru import logger
+from PIL import Image
 
 openai.api_key = config.settings.VSEGPT_API_KEY
 openai.api_base = config.settings.VSEGPT_BASE_URL
@@ -74,3 +77,17 @@ def check_sentiment(text: str):
             sentiment = getattr(models.Sentiments, sentiment_value.upper())
             return sentiment
     return models.Sentiments.NEUTRAL
+
+
+def screenshot_recognize(file):
+    try:
+        recognized_text = pytesseract.image_to_string(
+            Image.open(BytesIO(file)),
+            lang="rus",
+        )
+        non_empty_lines = [line for line in recognized_text.split("\n") if line.strip()]
+        cleaned_text = "\n".join(non_empty_lines)
+    except Exception as e:
+        logger.error(f"Error in recognizing text: {e}")
+        return None
+    return cleaned_text

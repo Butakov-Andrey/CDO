@@ -109,7 +109,6 @@ async def update_product(
 
 @router.delete(
     "/product/{product_id}",
-    # response_model=ProductSchema,
     description="Delete product by id.",
 )
 async def delete_product(
