@@ -32,7 +32,7 @@ bash build/migrations_build.sh
 bash build/migrations_activate.sh
 ```
 
-## Dev Requirements
+## Локальные зависимости для разработки
 Для локальной установки зависимостей, запустите следующие команды:
 ```
 pip install pip-tools
