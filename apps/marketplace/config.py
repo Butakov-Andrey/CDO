@@ -45,7 +45,7 @@ FEEDBACK TEXT FROM THE USER:
     ANSWER_PROMPT = """
 Provide your response as a JSON:
 {
-    "sentiment": <mood_of_the_feedback>
+    "sentiment": "<mood_of_the_feedback>"
 }
 """
 

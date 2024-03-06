@@ -2,7 +2,6 @@ import models
 from dependencies import get_session
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from fastapi.responses import Response
-from loguru import logger
 from sqlalchemy.orm import Session
 
 from .schema import CreateFeedbackSchema, FeedbackSchema
@@ -10,7 +9,7 @@ from .services import screenshot_recognize
 
 router = APIRouter(
     prefix="/api/v1",
-    tags=["feedbacks"],
+    tags=["feedback"],
     responses={404: {"description": "Not found"}},
 )
 
